@@ -14,7 +14,7 @@
  *
  *  * Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- *  * Redistributions in binary form must reproduce the above copyright
+ *  * Redistributions of binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
  *  * Neither the name of Textual, "Codeux Software, LLC", nor the
@@ -503,12 +503,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)userHome
 {
-	return [NSFileManager pathOfHomeDirectoryOutsideSandbox];
+	return [NSFileManager pathsForDirectoriesOfCurrentUser:outsideSandbox:YES].firstObject;
 }
 
 + (NSURL *)userHomeURL
 {
-	return [NSFileManager URLOfHomeDirectoryOutsideSandbox];
+	return [NSFileManager URLsForHomeDirectoryForCurrentUser:outsideSandbox:YES].firstObject;
 }
 
 + (nullable NSString *)userPreferences
