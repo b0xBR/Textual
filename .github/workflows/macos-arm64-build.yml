@@ -1,0 +1,72 @@
+# Textual (M5 Mac Optimized) CI/CD Pipeline
+
+name: Textual M5 Mac Build
+
+on: [push, pull_request]
+
+jobs:
+  build-macos-arm64:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python for ARM64
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "arm64"
+      
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install --no-interaction
+      
+      - name: Build for M5 Mac
+        run: |
+          python -m pip wheel . -w dist/ --config-settings=setup-args="--build-type=wheel"
+      
+      - name: Test on M5
+        run: |
+          python -c "import textual; print('Textual loaded successfully!')"
+      
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-wheel
+          path: dist/
+
+  build-macos-intel:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python for Intel Macs
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "x86_64"
+      
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install --no-interaction
+      
+      - name: Build for Intel Macs
+        run: |
+          python -m pip wheel . -w dist/
+
+  lint:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      
+      - name: Install linting tools
+        run: |
+          pip install ruff
+      
+      - name: Run linters
+        run: |
+          ruff check textual
