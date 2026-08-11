@@ -1,0 +1,50 @@
+# Textual Release Build for M5 Mac
+
+name: Release M5 Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release-macos-arm64:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12 for M5
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          architecture: "arm64"
+      
+      - name: Install maturin and dependencies
+        run: |
+          pip install maturin>=1.6.0
+      
+      - name: Build wheel for M5 Mac
+        run: |
+          maturin build --release --target-platform macosx_arm64
+          mv dist/*.whl textual-macos-arm64.whl
+      
+      - name: Upload release artifact
+        uses: svenstaro/upload-release-action@2.0.0
+        with:
+          file: textual-macos-arm64.whl
+          asset_name: textual-macos-arm64-${{ github.ref_name }}.whl
+          tag: ${{ github.ref_name }}
+          overwrite: true
+          body: |
+            🍎 Textual optimized for MacBook Pro M5 with 24GB RAM (macOS 26.6)
+            
+            ✨ Features:
+            - Metal GPU acceleration enabled
+            - Neural Engine integration
+            - Unified memory optimization
+            - ARM64 native compilation
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: textual-macos-arm64.whl
